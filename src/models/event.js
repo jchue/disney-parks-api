@@ -118,6 +118,6 @@ eventSchema.statics.stack = async function () {
   return { stack: buildChildren(events, resultsTemp) };
 };
 
-const Event = mongoose.model('Event', eventSchema);
+const Event = mongoose.model('Event', eventSchema, 'event');
 
 export default Event;
