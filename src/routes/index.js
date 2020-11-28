@@ -1,3 +1,9 @@
-import events from './events';
+var express = require('express');
+var router = express.Router();
 
-export default { events };
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  res.render('index', { title: 'Express' });
+});
+
+module.exports = router;

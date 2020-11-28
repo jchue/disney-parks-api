@@ -1,6 +1,7 @@
-import { Router } from 'express';
+import express from 'express';
+import Event from '../models/event';
 
-const router = Router();
+const router = express.Router();
 
 router.get('/', async (req, res) => {
   const events = await req.context.models.event.find();
@@ -12,12 +13,16 @@ router.get('/stack', async (req, res) => {
   return res.send(eventStack);
 });
 
-router.get('/:eventId', async (req, res) => {
+router.get('/:eventId', async (req, res, next) => {
   try {
     const event = await req.context.models.event.findById(req.params.eventId);
+
     return res.send(event);
   } catch (error) {
-    return res.status(404).send(error.message);
+    error.statusCode = 404;
+    error.message = `Requested event ${req.params.eventId} not found`;
+
+    next(error);
   }
 });
 

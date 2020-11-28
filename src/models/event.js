@@ -34,17 +34,6 @@ const eventSchema = new mongoose.Schema({
   },
 });
 
-eventSchema.statics.findById = async function (id) {
-  try {
-    const event = await this.findOne({
-      _id: id,
-    });
-    return event;
-  } catch (error) {
-    throw new Error(`The requested event ${error.value} could not be found.`);
-  }
-};
-
 eventSchema.statics.stack = async function () {
   // Temporary buffer
   const resultsTemp = await this.find();
@@ -118,6 +107,6 @@ eventSchema.statics.stack = async function () {
   return { stack: buildChildren(events, resultsTemp) };
 };
 
-const Event = mongoose.model('Event', eventSchema, 'event');
+const Event = mongoose.model('Event', eventSchema, 'events');
 
 export default Event;
