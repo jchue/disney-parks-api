@@ -3,26 +3,26 @@ import Event from '../models/event';
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-  const events = await req.context.models.event.find();
-  return res.send(events);
-});
+router.get('/', async (req, res, next) => {
+  const eventStack = await Event.stack();
 
-router.get('/stack', async (req, res) => {
-  const eventStack = await req.context.models.event.stack();
-  return res.send(eventStack);
+  res.data = eventStack;
+
+  next(); // Pass data to middleware
 });
 
 router.get('/:eventId', async (req, res, next) => {
   try {
-    const event = await req.context.models.event.findById(req.params.eventId);
+    const event = await Event.findById(req.params.eventId);
 
-    return res.send(event);
+    res.data = event;
+
+    next(); // Pass data to middleware
   } catch (error) {
     error.statusCode = 404;
-    error.message = `Requested event ${req.params.eventId} not found`;
+    error.detail = `Requested event ${req.params.eventId} not found`;
 
-    next(error);
+    next(error); // Pass error to middleware
   }
 });
 

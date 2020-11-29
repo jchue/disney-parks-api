@@ -41,7 +41,6 @@ npm run start
 You should be able to make requests to the following endpoints:
 
 - localhost:3000/api/events
-- localhost:3000/api/events/stack
 - localhost:3000/api/events/:eventId
 
 Further instructions about configuring and loading the database to come.
