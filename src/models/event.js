@@ -34,7 +34,7 @@ const eventSchema = new mongoose.Schema({
   },
 });
 
-eventSchema.statics.stack = async function () {
+eventSchema.statics.stack = async function stack() {
   // Temporary buffer
   const resultsTemp = await this.find();
 
@@ -104,7 +104,7 @@ eventSchema.statics.stack = async function () {
     return constructed;
   }
 
-  return { stack: buildChildren(events, resultsTemp) };
+  return buildChildren(events, resultsTemp);
 };
 
 const Event = mongoose.model('Event', eventSchema, 'events');

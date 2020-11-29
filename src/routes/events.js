@@ -1,14 +1,21 @@
 import express from 'express';
 import Event from '../models/event';
 
+const debug = require('debug')('disney-parks-api:server');
+
 const router = express.Router();
 
 router.get('/', async (req, res, next) => {
-  const eventStack = await Event.stack();
+  try {
+    const eventStack = await Event.stack();
 
-  res.data = eventStack;
+    res.data = eventStack;
 
-  next(); // Pass data to middleware
+    next(); // Pass data to middleware
+  } catch (error) {
+    debug(error);
+    next(error); // Pass error to middleware
+  }
 });
 
 router.get('/:eventId', async (req, res, next) => {
@@ -22,6 +29,7 @@ router.get('/:eventId', async (req, res, next) => {
     error.statusCode = 404;
     error.detail = `Requested event ${req.params.eventId} not found`;
 
+    debug(error);
     next(error); // Pass error to middleware
   }
 });
