@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 
 const eventSchema = new mongoose.Schema({
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
   name: {
     type: String,
     required: true,
@@ -15,28 +19,19 @@ const eventSchema = new mongoose.Schema({
   description: {
     type: String,
   },
-  parentId: {
-    type: mongoose.ObjectId,
+  trunk: {
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'Event',
   },
-  predecessorId: {
-    type: mongoose.ObjectId,
+  predecessor: {
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'Event',
-  },
-  groupId: {
-    type: String,
-  },
-  groupName: {
-    type: String,
-  },
-  children: {
-    type: ['eventSchema'],
   },
 });
 
 eventSchema.statics.stack = async function stack() {
   // Temporary buffer
-  const resultsTemp = await this.find();
+  const eventBuffer = await this.find();
 
   // Assign a group to each event
   function assignGroup(event, eventArray) {
@@ -63,48 +58,67 @@ eventSchema.statics.stack = async function stack() {
     return { groupId, groupName };
   }
 
-  for (let i = 0; i < resultsTemp.length; i++) {
-    resultsTemp[i].groupId = assignGroup(resultsTemp[i], resultsTemp).groupId;
-    resultsTemp[i].groupName = assignGroup(resultsTemp[i], resultsTemp).groupName;
+  function findSuccessor(ancestor, haystack) {
+    haystack.forEach((element) => {
+      if (String(element.predecessorId) === String(ancestor._id)) {
+        return element;
+      }
+    });
+  }
+
+  for (let i = 0; i < eventBuffer.length; i++) {
+    eventBuffer[i].groupId = assignGroup(eventBuffer[i], eventBuffer).groupId;
+    eventBuffer[i].groupName = assignGroup(eventBuffer[i], eventBuffer).groupName;
   }
 
   // Build response
   const events = [];
 
   // Add top-level events to response
-  for (let i = 0; i < resultsTemp.length; i++) {
-    if (resultsTemp[i].parentId == null) {
-      events.push(resultsTemp[i]);
-      events[events.length - 1].children = [];
+  for (let i = eventBuffer.length - 1; i > -1; i -= 1) {
+    if (eventBuffer[i].parentId == null) {
+      events.push((eventBuffer[i]));
 
       // Remove loaded event from buffer
-      resultsTemp.splice(i, 1);
-      i -= 1;
+      eventBuffer.splice(i, 1);
     }
   }
 
-  // Add child hierarchy
-  function buildChildren(mainArray, bufferArray) {
-    const constructed = mainArray;
-    for (let i = 0; i < constructed.length; i++) {
-      for (let j = 0; j < bufferArray.length; j++) {
-        if (JSON.stringify(bufferArray[j].parentId) === JSON.stringify(constructed[i]._id)) {
-          constructed[i].children.push(bufferArray[j]);
-          // constructed[i].children[bufferArray[i].children.length - 1].children = [];
+  // Find immediate children and return them in an array
+  function findChildren(parent, haystack) {
+    const haystackBuffer = haystack;
+    const children = [];
 
-          // Remove loaded event from buffer
-          bufferArray.splice(j, 1);
-          j -= 1;
+    for (let i = haystackBuffer.length - 1; i > -1; i -= 1) {
+      if (String(eventBuffer[i].parentId) === String(parent._id)) {
+        children.push(eventBuffer[i]);
 
-          buildChildren(constructed[i].children, bufferArray);
-        }
+        // Remove matched child to improve performance next loop
+        haystackBuffer.splice(i, 1);
       }
-    }
+    };
 
-    return constructed;
+    return children;
   }
 
-  return buildChildren(events, resultsTemp);
+  // Build descendant tree for a single event
+  function buildDescendants(parent, haystack) {
+    parent.children = findChildren(parent, haystack);
+
+    parent.children.forEach((event) => {
+      buildDescendants(event, haystack);
+    });
+  }
+
+  function buildStack(topLevel, bufferArray) {
+    topLevel.forEach((event) => {
+      buildDescendants(event, bufferArray);
+    });
+
+    return topLevel;
+  }
+
+  return buildStack(events, eventBuffer);
 };
 
 const Event = mongoose.model('Event', eventSchema, 'events');
