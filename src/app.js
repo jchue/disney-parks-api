@@ -7,6 +7,8 @@ import models from './models';
 import eventsRouter from './routes/events';
 import { title } from 'process';
 
+const debug = require('debug')('disney-parks-api:server');
+
 const app = express();
 
 app.use(logger('dev'));
@@ -23,13 +25,23 @@ app.use((req, res, next) => {
 app.use('/events', eventsRouter);
 
 // Standardize response structure
-app.use((req, res) => {
-  res.statusCode = res.statusCode || 200;
-  res.body = {
-    data: res.data,
-  };
+app.use((req, res, next) => {
+  if (!res.data) {
+    const error = {
+      statusCode: 404,
+      detail: `Requested resource at ${req.originalUrl} not found`,
+    };
 
-  return res.status(res.statusCode).json(res.body);
+    debug(error);
+    next(error); // Pass error to middleware
+  } else {
+    res.statusCode = res.statusCode || 200;
+    res.body = {
+      data: res.data,
+    };
+
+    return res.status(res.statusCode).json(res.body);
+  }
 });
 
 // Error handler
