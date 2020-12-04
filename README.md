@@ -10,6 +10,8 @@ Granted, the latter relationships may pose a more difficult problem, since succe
 
 The end result of all this will be a front end web app that visualizes this hierarchical timeline (most likely housed in a separate repository).
 
+The OpenAPI specification of the enpoints is [here](https://app.swaggerhub.com/apis/jchue/disney-parks-api/1.0.0#/info).
+
 ## Prerequisites
 
 - Node.js
