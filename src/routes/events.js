@@ -6,11 +6,20 @@ const debug = require('debug')('disney-parks-api:server');
 const router = express.Router();
 
 /**
- * Root route returns all events in a single-level list
+ * Root route returns all events as well as summaries of their heirs in a single-level list
  */
 router.get('/', async (req, res, next) => {
   try {
-    const events = await Event.find({}, ['name', 'startDate', 'endDate']).sort({ startDate: 1 });
+    let events = await Event.find({}, ['name', 'startDate', 'endDate']).sort({ startDate: 1 });
+
+    events = await Promise.all(events.map(async (event) => {
+      const heir = await event.getHeir();
+
+      return {
+        ...event.toObject(),
+        heir: heir || undefined,
+      };
+    }));
 
     res.data = events;
 
