@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "babel src --out-dir dist",
-    "serve": "node dist/bin/www",
-    "start": "nodemon --exec babel-node src/bin/www"
+    "build": "babel src --out-dir dist --copy-files",
+    "start": "node dist/bin/www",
+    "dev": "nodemon --exec babel-node src/bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
