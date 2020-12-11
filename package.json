@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "babel src —-out-dir dist",
+    "build": "babel src --out-dir dist",
     "serve": "node dist/bin/www",
     "start": "nodemon --exec babel-node src/bin/www"
   },
