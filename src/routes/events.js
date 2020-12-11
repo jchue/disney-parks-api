@@ -47,11 +47,35 @@ router.get('/:eventId', async (req, res, next) => {
     const successor = await event.findSuccessor();
     const heir = await event.getHeir();
 
+    // Get clumps
+    let clumps = Object.create(null);
+    await Promise.all(branches.map(async (branch) => {
+      // Get heir of branch
+      const clump = (await branch.getHeir()).name;
+
+      // Create clump for the heir if nonexistent
+      clumps[clump] = clumps[clump] || [];
+
+      // Add branch to clump
+      clumps[clump].push(branch);
+    }));
+
+    // Convert clumps object into array
+    clumps = Object.keys(clumps).map((key) => {
+      const clump = {
+        name: key,
+        branches: clumps[key],
+      };
+
+      return clump;
+    });
+
     // Convert document to plain object in order to add properties
     event = event.toObject();
     event = {
       ...event,
       branches: (branches.length ? branches : undefined),
+      clumps,
       successor: successor || undefined,
       heir: heir || undefined,
     };
