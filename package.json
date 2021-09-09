@@ -1,31 +1,36 @@
 {
   "name": "disney-parks-api",
-  "version": "0.0.0",
-  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "build": "babel src --out-dir dist --copy-files",
-    "start": "node dist/bin/www",
-    "dev": "nodemon --exec babel-node src/bin/www"
+    "build": "node --es-module-specifier-resolution=node ./lib/build.js",
+    "dev": "http-server ./build --cors -p 3000 -d false -e json -i false",
+    "start": "http-server ./build --cors -d false -e json -i false",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jchue/disney-parks-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jchue/disney-parks-api/issues"
+  },
+  "homepage": "https://github.com/jchue/disney-parks-api#readme",
   "dependencies": {
-    "cookie-parser": "~1.4.4",
-    "core-js": "^3.15.1",
-    "cors": "^2.8.5",
-    "debug": "~2.6.9",
-    "dotenv": "^8.6.0",
-    "express": "~4.16.1",
-    "mongoose": "^5.12.14",
-    "morgan": "~1.9.1",
-    "regenerator-runtime": "^0.13.7"
+    "dotenv": "^10.0.0",
+    "gray-matter": "^4.0.3",
+    "http-server": "^13.0.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.14.5",
-    "@babel/core": "^7.14.6",
-    "@babel/node": "^7.14.7",
-    "@babel/preset-env": "^7.14.7",
-    "eslint": "^7.29.0",
+    "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.23.4",
-    "nodemon": "^2.0.7"
+    "eslint-plugin-import": "^2.24.2"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
