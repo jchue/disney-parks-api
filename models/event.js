@@ -42,12 +42,12 @@ class Event {
    * Find successor by searching for event that references the current event as the predecessor
    * @returns {Event} - Immediate successor of the current event
    */
-  calcSuccessor() {
+  calcSuccessors() {
     const events = parseFiles();
-    const successor = events.filter((curr) => curr.predecessor === this.slug)[0];
+    const successors = events.filter((curr) => curr.predecessor === this.slug);
 
-    if (successor) {
-      return new Event(
+    if (successors.length) {
+      return successors.map((successor) => new Event(
         successor.slug,
         successor.name,
         successor.startDate,
@@ -55,7 +55,7 @@ class Event {
         successor.trunk,
         successor.predecessor,
         successor.content,
-      );
+      ));
     }
     return null;
   }
@@ -69,19 +69,19 @@ class Event {
   }
 
   /**
-   * Find the heir (last successor) by recursively finding successors
-   * @returns {Event} - The very last successor in the chain from the from the current event
+   * Find the forebear (first predecessor) by recursively finding predecessors
+   * @returns {Event} - The very first predecessor in the chain from the from the current event
    */
-  calcHeir() {
-    const successor = this.calcSuccessor();
+  calcForebear() {
+    const predecessor = this.calcPredecessor();
 
     // Exit condition: when there are no successors of the current node
-    if (!successor) {
+    if (!predecessor) {
       return this;
     }
 
     // Recursion
-    return successor.calcHeir();
+    return predecessor.calcForebear();
   }
 
   /**
@@ -116,15 +116,15 @@ class Event {
     // Get clumps
     const clumps = Object.create(null);
     branches.forEach((curr) => {
-      // Get heir of branch
-      const heir = curr.calcHeir().slug;
+      // Get forebear of branch
+      const forebear = curr.calcForebear().slug;
 
-      // Create clump for the heir if nonexistent
-      clumps[heir] = clumps[heir] || [];
+      // Create clump for the forebear if nonexistent
+      clumps[forebear] = clumps[forebear] || [];
 
       // Add reduced branch to clump
       const truncated = curr.truncate(['slug', 'name', 'startDate', 'endDate']);
-      clumps[heir].push(truncated);
+      clumps[forebear].push(truncated);
     });
 
     return Object.keys(clumps).map((key) => ({
