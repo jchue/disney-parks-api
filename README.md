@@ -32,7 +32,7 @@ Start development server
 npm run dev
 ```
 
-You should be able to make requests to `localhost:3000/:slug`.
+You should be able to make requests to `localhost:3000/timeline/:slug`.
 
 ## Disclaimer
 
