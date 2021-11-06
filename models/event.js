@@ -38,13 +38,27 @@ class Event {
     return null;
   }
 
+  static splitSlug(slug) {
+    const slugArray = slug.split('/');
+    const contextArray = slugArray.slice(0, slugArray.length - 1);
+    const nodeArray = slugArray.slice(slugArray.length - 1);
+
+    return {
+      context: contextArray.join('/'),
+      nodeName: nodeArray.join('/'),
+    };
+  }
+
   /**
    * Find successor by searching for event that references the current event as the predecessor
    * @returns {Event} - Immediate successor of the current event
    */
   calcSuccessors() {
+    // Context will be used to prefix the predecessor, which does not include the full path
+    const { context } = Event.splitSlug(this.slug);
+
     const events = parseFiles();
-    const successors = events.filter((curr) => curr.predecessor === this.slug);
+    const successors = events.filter((curr) => `${context}/${curr.predecessor}` === this.slug);
 
     if (successors.length) {
       return successors.map((successor) => new Event(
@@ -65,7 +79,10 @@ class Event {
    * @returns {Event} - Immediate predecessor of the current event
    */
   calcPredecessor() {
-    return this.predecessor ? Event.findBySlug(this.predecessor) : null;
+    // Context will be used to prefix the predecessor, which does not include the full path
+    const { context } = Event.splitSlug(this.slug);
+
+    return this.predecessor ? Event.findBySlug(`${context}/${this.predecessor}`) : null;
   }
 
   /**
@@ -91,8 +108,12 @@ class Event {
   calcBranches() {
     const events = parseFiles();
 
-    // Filter based on trunk and create new Event for each
-    const branches = events.filter((curr) => curr.trunk === this.slug)
+    // Filter based on current context and create new Event for each
+    const branches = events.filter((curr) => {
+      const { context } = Event.splitSlug(curr.slug);
+
+      return context === this.slug;
+    })
       .map((curr) => new Event(
         curr.slug,
         curr.name,
