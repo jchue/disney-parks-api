@@ -6,7 +6,7 @@ The concept is a hierarchical timeline of the Disney parks and the attractions c
 
 Granted, the latter relationships may pose a more difficult problem, since succession is not always straightforward. In other words, it can be defined as the replacement of an attraction within a physical space or a more conceptual/spiritual replacement. Additionally, when dealing with physical succession, a predecessor may be larger and may be replaced by multiple successors, and vice-versa. These issues are going to need to be analyzed further before a suitable data model is finalized.
 
-The end result of all this will be a front end web app that visualizes this hierarchical timeline (most likely housed in a separate repository).
+The source data is contained in `.md` files located in the `data` directory, allowing for contributions to be easily incorporated. The build script converts them into `.json` files to be served as a static API. The end result of all this is a front end web app that visualizes this hierarchical timeline (housed in a separate repository).
 
 ## Development
 
