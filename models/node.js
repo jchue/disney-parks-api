@@ -1,12 +1,11 @@
 import { parseFiles } from '../lib/io';
 
-class Event {
+class Node {
   constructor(
     slug,
     name,
     startDate,
     endDate,
-    trunk,
     predecessor,
     content,
   ) {
@@ -14,24 +13,22 @@ class Event {
     this.name = name;
     this.startDate = startDate;
     this.endDate = endDate;
-    this.trunk = trunk;
     this.predecessor = predecessor;
     this.content = content;
   }
 
   static findBySlug(slug) {
-    const events = parseFiles();
-    const event = events.filter((curr) => curr.slug === slug)[0];
+    const nodes = parseFiles();
+    const node = nodes.filter((curr) => curr.slug === slug)[0];
 
-    if (event) {
-      return new Event(
-        event.slug,
-        event.name,
-        event.startDate,
-        event.endDate,
-        event.trunk,
-        event.predecessor,
-        event.content,
+    if (node) {
+      return new Node(
+        node.slug,
+        node.name,
+        node.startDate,
+        node.endDate,
+        node.predecessor,
+        node.content,
       );
     }
 
@@ -50,23 +47,22 @@ class Event {
   }
 
   /**
-   * Find successor by searching for event that references the current event as the predecessor
-   * @returns {Event} - Immediate successor of the current event
+   * Find successor by searching for node that references the current node as the predecessor
+   * @returns {Node} - Immediate successor of the current node
    */
   calcSuccessors() {
     // Context will be used to prefix the predecessor, which does not include the full path
-    const { context } = Event.splitSlug(this.slug);
+    const { context } = Node.splitSlug(this.slug);
 
-    const events = parseFiles();
-    const successors = events.filter((curr) => `${context}/${curr.predecessor}` === this.slug);
+    const nodes = parseFiles();
+    const successors = nodes.filter((curr) => `${context}/${curr.predecessor}` === this.slug);
 
     if (successors.length) {
-      return successors.map((successor) => new Event(
+      return successors.map((successor) => new Node(
         successor.slug,
         successor.name,
         successor.startDate,
         successor.endDate,
-        successor.trunk,
         successor.predecessor,
         successor.content,
       ));
@@ -75,19 +71,19 @@ class Event {
   }
 
   /**
-   * Find predecessor by returning the event listed as the predecessor of the current event
-   * @returns {Event} - Immediate predecessor of the current event
+   * Find predecessor by returning the node listed as the predecessor of the current node
+   * @returns {Node} - Immediate predecessor of the current node
    */
   calcPredecessor() {
     // Context will be used to prefix the predecessor, which does not include the full path
-    const { context } = Event.splitSlug(this.slug);
+    const { context } = Node.splitSlug(this.slug);
 
-    return this.predecessor ? Event.findBySlug(`${context}/${this.predecessor}`) : null;
+    return this.predecessor ? Node.findBySlug(`${context}/${this.predecessor}`) : null;
   }
 
   /**
    * Find the forebear (first predecessor) by recursively finding predecessors
-   * @returns {Event} - The very first predecessor in the chain from the from the current event
+   * @returns {Node} - The very first predecessor in the chain from the from the current node
    */
   calcForebear() {
     const predecessor = this.calcPredecessor();
@@ -102,74 +98,72 @@ class Event {
   }
 
   /**
-   * Get all the branches of the current event
-   * @returns {Array} - The branches of the current event
+   * Get all the subnodes of the current node
+   * @returns {Array} - The subnodes of the current node
    */
-  calcBranches() {
-    const events = parseFiles();
+  calcSubnodes() {
+    const nodes = parseFiles();
 
-    // Filter based on current context and create new Event for each
-    const branches = events.filter((curr) => {
-      const { context } = Event.splitSlug(curr.slug);
+    // Filter based on current context and create new Node for each
+    const subnodes = nodes.filter((curr) => {
+      const { context } = Node.splitSlug(curr.slug);
 
       return context === this.slug;
     })
-      .map((curr) => new Event(
+      .map((curr) => new Node(
         curr.slug,
         curr.name,
         curr.startDate,
         curr.endDate,
-        curr.trunk,
         curr.predecessor,
         curr.content,
       ));
 
-    return branches;
+    return subnodes;
   }
 
   /**
-   * Compiles the clumps of the current event along with their respective branches
+   * Compiles the subgroups of the current node along with their respective subnodes
    * @returns {Object}
    */
-  calcClumps() {
-    const branches = this.calcBranches();
+  calcSubgroups() {
+    const subnodes = this.calcSubnodes();
 
-    // Get clumps
-    const clumps = Object.create(null);
-    branches.forEach((curr) => {
-      // Get forebear of branch
+    // Get subgroups
+    const subgroups = Object.create(null);
+    subnodes.forEach((curr) => {
+      // Get forebear of subnode
       const forebear = curr.calcForebear().slug;
 
-      // Create clump for the forebear if nonexistent
-      clumps[forebear] = clumps[forebear] || [];
+      // Create subgroup for the forebear if nonexistent
+      subgroups[forebear] = subgroups[forebear] || [];
 
-      // Add reduced branch to clump
+      // Add reduced subnode to subgroup
       const truncated = curr.truncate(['slug', 'name', 'startDate', 'endDate']);
-      clumps[forebear].push(truncated);
+      subgroups[forebear].push(truncated);
     });
 
-    return Object.keys(clumps).map((key) => ({
+    return Object.keys(subgroups).map((key) => ({
       name: key,
-      branches: clumps[key],
+      subnodes: subgroups[key],
     }));
   }
 
   /**
    * Reduce the number of fields
    * @param {Array} fields - The fields to keep
-   * @returns {Event} - A new Event with only the specified fields
+   * @returns {Node} - A new Node with only the specified fields
    */
   truncate(fields = ['slug']) {
-    return new Event(
+    return new Node(
       fields.includes('slug') ? this.slug : undefined,
       fields.includes('name') ? this.name : undefined,
       fields.includes('startDate') ? this.startDate : undefined,
       fields.includes('endDate') ? this.endDate : undefined,
-      fields.includes('trunk') ? this.trunk : undefined,
       fields.includes('predecessor') ? this.predecessor : undefined,
       fields.includes('content') ? this.content : undefined,
     );
   }
 }
 
-export default Event;
+export default Node;

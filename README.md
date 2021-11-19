@@ -8,6 +8,19 @@ Granted, the latter relationships may pose a more difficult problem, since succe
 
 The source data is contained in `.md` files located in the `data` directory, allowing for contributions to be easily incorporated. The build script converts them into `.json` files to be served as a static API. The end result of all this is a front end web app that visualizes this hierarchical timeline (housed in a separate repository).
 
+## Definitions
+
+- **node:** a tracked object (e.g., park, land, attraction, etc.)
+- **predecessor:** the previous chronological iteration of a given node
+- **forebear:** the very first predecessor in a given predecessor chain
+- **successor:** the next chronological iteration of a given node
+- **group:** a group of logical predecessors/successors
+- **subgroups:** the groups that a given node "contains"
+- **subnodes:** the nodes that a given node "contains" (comprising the subgroups)
+- **slug:** the unique identifier of a node, comprised of the following:
+  - **context:** the group path down to the node
+  - **nodeName:** the name of the node itself
+
 ## Development
 
 Clone repository
