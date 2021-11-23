@@ -17,6 +17,11 @@ class Node {
     this.content = content;
   }
 
+  /**
+   * Gets the node corresponding to the given slug
+   * @param {String} slug - Full slug of the node
+   * @returns {Node} - Node that matches the given slug
+   */
   static findBySlug(slug) {
     const nodes = parseFiles();
     const node = nodes.filter((curr) => curr.slug === slug)[0];
@@ -35,6 +40,11 @@ class Node {
     return null;
   }
 
+  /**
+   * Splits the slug into the context and the node name
+   * @param {String} slug - Full slug
+   * @returns {Object} - Object containing the context and the node name
+   */
   static splitSlug(slug) {
     const slugArray = slug.split('/');
     const contextArray = slugArray.slice(0, slugArray.length - 1);
