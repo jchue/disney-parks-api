@@ -2,7 +2,6 @@
 name: 'Adventure Thru Inner Space'
 startDate: '1967-08-05'
 endDate: '1985-09-02'
-trunk: 'tomorrowland'
 predecessor: 'monsanto-hall-of-chemistry'
 ---
 

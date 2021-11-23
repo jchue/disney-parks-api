@@ -1,7 +1,6 @@
 ---
 name: 'Critter Country'
 startDate: '1988-01-01'
-trunk: 'disneyland'
 predecessor: 'bear-country'
 ---
 
