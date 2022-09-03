@@ -21,4 +21,6 @@ During the expansion, the property was named the Disneyland Resort to encompass 
 <figcaption>An Amtrak bus waits outside of Travelport and Disneyland Hotel in Anaheim, California [<a href="https://commons.wikimedia.org/wiki/File:Disneyland_Hotel,_8-13-1980.jpg">Orange County Archives</a>, <a href="https://creativecommons.org/licenses/by/2.0">CC BY 2.0</a>, via Wikimedia Commons]</figcaption>
 </figure>
 
+<hr>
+
 <small>Wikipedia contributors. "Disneyland Resort." _Wikipedia, The Free Encyclopedia_. Wikipedia, The Free Encyclopedia, 26 Nov. 2021. Web. 30 Nov. 2021.</small>
